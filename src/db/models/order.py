@@ -1,11 +1,10 @@
 from sqlalchemy import Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
-from src.db.base import Base
+from src.db.base import Base, BaseMixin
 
 
-class Order(Base):
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+class Order(Base, BaseMixin):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
@@ -13,8 +12,7 @@ class Order(Base):
     items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="order")
 
 
-class OrderItem(Base):
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+class OrderItem(Base, BaseMixin):
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)

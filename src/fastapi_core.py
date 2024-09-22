@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
 def mount_folders(app: FastAPI):
     app.mount(
         "/static",
-        StaticFiles(directory=APP_ROOT / "static"),
+        StaticFiles(directory=APP_ROOT / "assets/static"),
         name="static",
     )
     app.mount("/media", StaticFiles(directory=Path("assets/media")), name="media")
@@ -29,7 +29,7 @@ def mount_folders(app: FastAPI):
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Navbatda API",
+        title="Coffe Shop POS API",
         version="1.0.0",
         default_response_class=ORJSONResponse,
         lifespan=lifespan

@@ -9,7 +9,7 @@ from src.settings import settings
 
 
 class BaseMixin:
-    uuid = Column(String(36), nullable=False, default=generate_uuid, primary_key=True)
+    id = Column(String(36), nullable=False, default=generate_uuid, primary_key=True)
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, default=datetime.now(pytz.utc)
     )
