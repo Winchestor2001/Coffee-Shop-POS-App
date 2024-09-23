@@ -3,6 +3,7 @@ Taken from
 https://github.com/mahenzon/ri-sdk-python-wrapper/blob/master/ri_sdk_codegen/utils/case_converter.py
 """
 import uuid
+from enum import Enum
 
 
 def camel_case_to_snake_case(input_str: str) -> str:
@@ -33,3 +34,8 @@ def camel_case_to_snake_case(input_str: str) -> str:
 def generate_uuid():
     return str(uuid.uuid4())
 
+
+class RoleEnum(Enum):
+    ADMIN = "admin"
+    USER = "user"
+    BARMAN = "barmen"

@@ -2,9 +2,10 @@ import time
 import bcrypt
 from typing import Union
 from jose import JWTError, jwt
-from fastapi import HTTPException, status, Request
+from fastapi import HTTPException, status, Request, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from src.db import db_helper
 from src.settings import settings
 
 
@@ -20,15 +21,9 @@ class JwtBearer(HTTPBearer):
     )
 
     def __init__(self, auto_error: bool = True):
-        """
-        Initialize the JwtBearer class.
-
-        Args:
-            auto_error: Whether to raise an exception automatically.
-        """
         super(JwtBearer, self).__init__(auto_error=auto_error)
 
-    async def __call__(self, request: Request) -> str:
+    async def __call__(self, request: Request) -> dict:
         """
         Handle the JWT authentication request.
 
@@ -36,7 +31,7 @@ class JwtBearer(HTTPBearer):
             request: The HTTP request.
 
         Returns:
-            str: The JWT token if valid.
+            dict: The decoded JWT payload if valid.
 
         Raises:
             HTTPException: If the credentials are invalid.
@@ -47,10 +42,12 @@ class JwtBearer(HTTPBearer):
             if credentials.scheme != "Bearer":
                 raise self.credentials_exception
 
-            if not self.verify_access_token(credentials.credentials):
+            # Verify and return the decoded token payload
+            token_payload = self.verify_access_token(credentials.credentials)
+            if not token_payload:
                 raise self.credentials_exception
 
-            return credentials.credentials
+            return token_payload
 
         raise self.credentials_exception
 
@@ -63,12 +60,24 @@ class JwtBearer(HTTPBearer):
         return encoded_jwt
 
     @classmethod
-    def verify_access_token(cls, token: str):
+    def verify_access_token(cls, token: str) -> Union[dict, None]:
+        """
+        Verify the JWT token and return the decoded payload.
+
+        Args:
+            token: The JWT token to verify.
+
+        Returns:
+            dict: The decoded JWT payload if the token is valid.
+
+        Raises:
+            HTTPException: If the token is invalid.
+        """
         try:
             payload = jwt.decode(token, cls.SECRET_KEY, algorithms=[cls.ALGORITHM])
             return payload
         except JWTError:
-            raise cls.credentials_exception
+            return None
 
 
 async def hash_password(password: str) -> bytes:
@@ -80,4 +89,17 @@ async def hash_password(password: str) -> bytes:
 async def verify_password(password: str, hashed_password: bytes) -> bool:
     pwd_bytes: bytes = password.encode()
     return bcrypt.checkpw(pwd_bytes, hashed_password)
+
+
+def role_check(allowed_roles: list):
+    from src.api.user.crud import get_user_info_obj
+    async def check_role(token_payload: dict = Depends(JwtBearer())):
+        # Now token_payload contains the decoded JWT data
+        async with db_helper.session_factory() as session:
+            user_role = (await get_user_info_obj(
+                session=session, user_id=token_payload['id']
+            )).role
+        if user_role not in allowed_roles:
+            raise HTTPException(status_code=403, detail=f"For {user_role} role permission decided")
+    return check_role
 

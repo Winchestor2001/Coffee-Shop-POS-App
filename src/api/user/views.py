@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/regtest")
 async def authenticate_user(
-        auth_data: schemas.AuthUser,
+        auth_data: schemas.RegTest,
         session: Annotated[
             AsyncSession,
             Depends(db_helper.session_getter)
@@ -32,7 +32,7 @@ async def authenticate_user(
 ):
     user_obj = await crud.get_user_info_obj(session, auth_data.phone_number)
     if await utils.verify_password(auth_data.password, user_obj.password):
-        token_data = {"id": user_obj.id}
+        token_data = {"id": user_obj.id, "role": user_obj.role}
         access_token = utils.JwtBearer.create_access_token(token_data)
         return {"access_token": access_token, "token_type": "bearer"}
     else:

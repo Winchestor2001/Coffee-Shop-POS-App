@@ -9,3 +9,4 @@ pytz
 black
 python-jose
 bcrypt
+orjson
