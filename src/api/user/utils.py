@@ -98,7 +98,7 @@ def role_check(allowed_roles: list):
         async with db_helper.session_factory() as session:
             user_role = (await get_user_info_obj(
                 session=session, user_id=token_payload['id']
-            )).role
+            )).user_role.value
         if user_role not in allowed_roles:
             raise HTTPException(status_code=403, detail=f"For {user_role} role permission decided")
     return check_role

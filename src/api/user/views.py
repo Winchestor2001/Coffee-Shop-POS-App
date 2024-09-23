@@ -32,7 +32,7 @@ async def authenticate_user(
 ):
     user_obj = await crud.get_user_info_obj(session, auth_data.phone_number)
     if await utils.verify_password(auth_data.password, user_obj.password):
-        token_data = {"id": user_obj.id, "role": user_obj.role}
+        token_data = {"id": user_obj.id}
         access_token = utils.JwtBearer.create_access_token(token_data)
         return {"access_token": access_token, "token_type": "bearer"}
     else:
@@ -48,6 +48,6 @@ async def user_info(
         token: str = Depends(utils.JwtBearer()),
 
 ):
-    user_id = utils.JwtBearer.verify_access_token(token)["id"]
+    user_id = token["id"]
     user_obj = await crud.get_user_info_obj(session, user_id=user_id)
     return user_obj

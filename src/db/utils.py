@@ -35,7 +35,13 @@ def generate_uuid():
     return str(uuid.uuid4())
 
 
-class RoleEnum(Enum):
+class UserRoleEnum(Enum):
     ADMIN = "admin"
     USER = "user"
     BARMAN = "barmen"
+
+
+class ItemEnum(Enum):
+    LITER = "L"
+    KILOGRAMS = "KG"
+    QUANTITY = "Q"

@@ -3,6 +3,7 @@ import datetime
 
 from pydantic import BaseModel, field_validator, ConfigDict
 
+from src.db.utils import UserRoleEnum
 from src.settings import settings
 
 
@@ -33,7 +34,7 @@ class UserInfo(BaseModel):
     id: str
     full_name: str
     phone_number: str
-    role: str
+    user_role: UserRoleEnum
     created_at: datetime.datetime
     updated_at: datetime.datetime
 
