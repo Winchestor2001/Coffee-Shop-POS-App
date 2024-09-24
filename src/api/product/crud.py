@@ -1,8 +1,10 @@
 from typing import Sequence
 from sqlalchemy import select, update, delete
+from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.models import Product
+from src.db import InventoryItem
+from src.db.models import Product, ProductIngredient
 
 
 async def add_product_obj(session: AsyncSession, product_data: dict) -> Product:
@@ -12,8 +14,30 @@ async def add_product_obj(session: AsyncSession, product_data: dict) -> Product:
     return product_obj
 
 
+async def add_product_ingredient_obj(session: AsyncSession, ingredients: list, product_id: str) -> None:
+    for item in ingredients:
+        item['product_id'] = product_id
+        product_ingredient_obj = ProductIngredient(**item)
+        session.add(product_ingredient_obj)
+        await session.commit()
+
+
+async def get_product_obj(session: AsyncSession, product_id: str) -> Product:
+    stmt = select(Product).filter(
+        Product.obj_state == 1, Product.id == product_id
+    ).options(
+        selectinload(Product.ingredients).selectinload(ProductIngredient.inventory)
+    )
+    result = await session.execute(stmt)
+    return result.scalars().first()
+
+
 async def get_products_obj(session: AsyncSession) -> Sequence[Product]:
-    stmt = select(Product).filter(Product.obj_state == 1)
+    stmt = select(Product).filter(
+        Product.obj_state == 1
+    ).options(
+        selectinload(Product.ingredients).selectinload(ProductIngredient.inventory)
+    )
     result = await session.execute(stmt)
     return result.scalars().all()
 

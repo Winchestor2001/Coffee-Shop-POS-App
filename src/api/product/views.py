@@ -20,8 +20,15 @@ async def add_product(
             Depends(db_helper.session_getter)
         ],
         token: str = Depends(JwtBearer())):
-    product_obj = await crud.add_product_obj(session, product_data.model_dump())
-    return product_obj
+    ingredients = [item.model_dump() for item in product_data.ingredients]
+    product_data_dict = product_data.model_dump()
+
+    product_data_dict.pop("ingredients")
+
+    product_obj = await crud.add_product_obj(session, product_data_dict)
+    await crud.add_product_ingredient_obj(session, ingredients, product_obj.id)
+    product = await crud.get_product_obj(session, product_obj.id)
+    return product
 
 
 @router.get("/list", response_model=List[schemas.ProductInfo])

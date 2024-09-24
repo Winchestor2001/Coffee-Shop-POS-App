@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
 from src.db.dependencies import db_helper
+from src.logging_conf import setup_logger
 
 APP_ROOT = Path(__file__).parent
 
@@ -44,5 +45,5 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
+    setup_logger()
     return app

@@ -45,3 +45,17 @@ class ItemEnum(Enum):
     LITER = "L"
     KILOGRAMS = "KG"
     QUANTITY = "Q"
+
+
+class SizeEnum(Enum):
+    SMALL = "samll"
+    MEDIUM = "medium"
+    LARGE = "large"
+
+
+class ColorEnum(Enum):
+    RED = "red"
+    BLUE = "blue"
+    GREY = "grey"
+    YELLOW = "yellow"
+    PINK = "pink"

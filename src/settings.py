@@ -51,6 +51,7 @@ class Settings(BaseSettings):
     db: DatabaseConfig
 
     pattern: str = r"^\+998(90|91|97|33|94|93|98|88|77|71|55|95|50|20|99)\d{7}$"
+    log_file_path: str = "debug.log"
 
 
 settings = Settings()

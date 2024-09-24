@@ -11,3 +11,9 @@ class AddInventory(BaseModel):
 
 class UpdateInventory(AddInventory):
     pass
+
+
+class InventoryInfo(BaseModel):
+    product_name: str
+    quantity: int
+    unit: ItemEnum
