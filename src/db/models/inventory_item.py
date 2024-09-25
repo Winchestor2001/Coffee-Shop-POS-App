@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 class InventoryItem(Base, BaseMixin):
     product_name: Mapped[str]
     quantity: Mapped[int]
+    price: Mapped[float]
     unit: Mapped[ItemEnum] = mapped_column(nullable=False)
 
     product_ingredient: Mapped["ProductIngredient"] = relationship(back_populates="inventory")

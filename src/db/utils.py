@@ -47,6 +47,14 @@ class ItemEnum(Enum):
     QUANTITY = "Q"
 
 
+class IngredientUnitEnum(Enum):
+    LITER = "L"
+    MILLILITER = "ML"
+    KILOGRAMS = "KG"
+    GRAM = "G"
+    QUANTITY = "Q"
+
+
 class SizeEnum(Enum):
     SMALL = "samll"
     MEDIUM = "medium"

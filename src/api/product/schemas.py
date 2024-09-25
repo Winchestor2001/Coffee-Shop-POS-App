@@ -4,19 +4,19 @@ from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 from src.api.inventory.schemas import InventoryInfo
-from src.db.utils import SizeEnum, ColorEnum
+from src.db.utils import SizeEnum, ColorEnum, IngredientUnitEnum
 
 
 class ProductIngredientSchema(BaseModel):
     inventory_id: str
     quantity: float
-    size: SizeEnum
+    unit: IngredientUnitEnum
 
 
 class ProductIngredientInfo(BaseModel):
     id: str
     quantity: float
-    size: SizeEnum
+    unit: IngredientUnitEnum
     inventory: InventoryInfo
 
 
@@ -25,6 +25,7 @@ class AddProduct(BaseModel):
     description: str | None = None
     price: float
     color: ColorEnum
+    size: SizeEnum
     ingredients: List[ProductIngredientSchema]
 
 
