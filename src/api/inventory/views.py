@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, List
+from typing import Annotated, List, Dict
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,8 +12,8 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-
-@router.post("/add", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))])
+@router.post("/add", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+             response_model=schemas.InventoryInfo)
 async def add_inventory(
         product_data: schemas.AddInventory,
         session: Annotated[
@@ -24,7 +24,8 @@ async def add_inventory(
     return inventory_obj
 
 
-@router.get("/list", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))])
+@router.get("/list", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+            response_model=List[schemas.InventoryInfo])
 async def inventory_list(
         session: Annotated[
             AsyncSession,
@@ -34,7 +35,8 @@ async def inventory_list(
     return inventory_objs
 
 
-@router.put("/update", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))])
+@router.put("/update", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+            response_model=schemas.UpdateInventory)
 async def inventory_update(
         inventor_id: str,
         inventor_data: schemas.UpdateInventory,
@@ -46,7 +48,8 @@ async def inventory_update(
     return inventor_data
 
 
-@router.delete("/remove/{inventory_id}", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))])
+@router.delete("/remove/{inventory_id}", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+               response_model=Dict[str, str])
 async def remove_inventory(
         inventory_id: str,
         session: Annotated[
@@ -56,4 +59,3 @@ async def remove_inventory(
 ):
     await crud.remove_inventory_obj(session, inventory_id)
     return {"detail": f"Inventory: {inventory_id} removed successfully"}
-

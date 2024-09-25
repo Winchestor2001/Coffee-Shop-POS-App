@@ -1,10 +1,19 @@
+import logging
 from typing import Sequence
 from sqlalchemy import select, update, delete
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db import InventoryItem
-from src.db.models import Product, ProductIngredient
+from src.db.models import Product, ProductIngredient, ProductCategory
+
+logger = logging.getLogger(__name__)
+
+
+async def add_category_obj(session: AsyncSession, category_data: str) -> ProductCategory:
+    category_obj = ProductCategory(name=category_data)
+    session.add(category_obj)
+    await session.commit()
+    return category_obj
 
 
 async def add_product_obj(session: AsyncSession, product_data: dict) -> Product:
@@ -17,6 +26,7 @@ async def add_product_obj(session: AsyncSession, product_data: dict) -> Product:
 async def add_product_ingredient_obj(session: AsyncSession, ingredients: list, product_id: str) -> None:
     for item in ingredients:
         item['product_id'] = product_id
+        logger.info(item)
         product_ingredient_obj = ProductIngredient(**item)
         session.add(product_ingredient_obj)
         await session.commit()
@@ -30,6 +40,14 @@ async def get_product_obj(session: AsyncSession, product_id: str) -> Product:
     )
     result = await session.execute(stmt)
     return result.scalars().first()
+
+
+async def get_categories_obj(session: AsyncSession) -> Sequence[ProductCategory]:
+    stmt = select(ProductCategory).filter(
+        ProductCategory.obj_state == 1
+    )
+    result = await session.execute(stmt)
+    return result.scalars().all()
 
 
 async def get_products_obj(session: AsyncSession) -> Sequence[Product]:

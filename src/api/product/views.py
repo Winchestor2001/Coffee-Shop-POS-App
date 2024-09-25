@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, List
+from typing import Annotated, List, Dict
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +12,21 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.post("/add", dependencies=[Depends(JwtBearer()), Depends(role_check(["barman", "admin"]))])
+@router.post("/category/add", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+             response_model=schemas.AddProductCategory)
+async def add_product(
+        category_data: schemas.AddProductCategory,
+        session: Annotated[
+            AsyncSession,
+            Depends(db_helper.session_getter)
+        ],
+        token: str = Depends(JwtBearer())):
+    category_obj = await crud.add_category_obj(session, category_data.name)
+    return category_obj
+
+
+@router.post("/add", dependencies=[Depends(JwtBearer()), Depends(role_check(["barman", "admin"]))],
+             response_model=schemas.ProductInfo)
 async def add_product(
         product_data: schemas.AddProduct,
         session: Annotated[
@@ -31,7 +45,20 @@ async def add_product(
     return product
 
 
-@router.get("/list", response_model=List[schemas.ProductInfo])
+@router.get("/category/list", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+            response_model=List[schemas.ProductCategoryInfo])
+async def products_list(
+        session: Annotated[
+            AsyncSession,
+            Depends(db_helper.session_getter)
+        ]
+):
+    categories = await crud.get_categories_obj(session)
+    return categories
+
+
+@router.get("/list", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+            response_model=List[schemas.ProductInfo])
 async def products_list(
         session: Annotated[
             AsyncSession,
@@ -42,7 +69,8 @@ async def products_list(
     return products
 
 
-@router.put("/update/{product_id}", dependencies=[Depends(JwtBearer()), Depends(role_check(["barman", "admin"]))])
+@router.put("/update/{product_id}", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+            response_model=schemas.ProductUpdate)
 async def update_product(
         product_id: str,
         product_data: schemas.ProductUpdate,
@@ -55,7 +83,8 @@ async def update_product(
     return product_data
 
 
-@router.delete("/remove/{product_id}", dependencies=[Depends(JwtBearer()), Depends(role_check(["barman", "admin"]))])
+@router.delete("/remove/{product_id}", dependencies=[Depends(JwtBearer()), Depends(role_check(["admin"]))],
+               response_model=Dict[str, str])
 async def remove_product(
         product_id: str,
         session: Annotated[

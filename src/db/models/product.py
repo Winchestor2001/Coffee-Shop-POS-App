@@ -33,6 +33,7 @@ class ProductIngredient(Base, BaseMixin):
     inventory_id: Mapped[str] = mapped_column(ForeignKey("inventory_items.id"), nullable=False)
     quantity: Mapped[float]
     unit: Mapped[IngredientUnitEnum] = mapped_column(nullable=False)
+    extra_item: Mapped[bool] = mapped_column(default=False, nullable=False)
 
     product: Mapped["Product"] = relationship(back_populates="ingredients")
     inventory: Mapped["InventoryItem"] = relationship(back_populates="product_ingredient")

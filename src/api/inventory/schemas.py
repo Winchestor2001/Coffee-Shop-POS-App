@@ -6,6 +6,7 @@ from src.db.utils import ItemEnum
 class AddInventory(BaseModel):
     product_name: str
     quantity: int
+    price: float
     unit: ItemEnum
 
 
@@ -13,7 +14,7 @@ class UpdateInventory(AddInventory):
     pass
 
 
-class InventoryInfo(BaseModel):
-    product_name: str
-    quantity: int
-    unit: ItemEnum
+class InventoryInfo(AddInventory):
+    id: str
+    created_at: datetime
+    updated_at: datetime
